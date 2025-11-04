@@ -41,9 +41,9 @@ const App: React.FC = () => {
       'CHHA', 'CNA', 'HHA', 'Auto Insurance'
     ],
     preScreenQuestions: [
-        { id: 1, question: 'Do you have experience as a caregiver?', type: QuestionType.YES_NO },
-        { id: 2, question: 'How many years of experience?', type: QuestionType.NUMBER },
-        { id: 3, question: 'Do you have a valid Driver’s License?', type: QuestionType.YES_NO },
+        { id: 1, question: 'Do you have experience as a caregiver?', type: QuestionType.YES_NO, isQualifying: false },
+        { id: 2, question: 'How many years of experience?', type: QuestionType.NUMBER, isQualifying: false },
+        { id: 3, question: 'Do you have a valid Driver’s License?', type: QuestionType.YES_NO, isQualifying: false },
     ],
   });
   const [errors, setErrors] = useState<FormErrors>({});

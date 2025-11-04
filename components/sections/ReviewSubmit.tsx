@@ -95,7 +95,6 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
                                     <div key={day} className="flex">
                                         <dt className="w-24 font-medium text-slate-500">{day}</dt>
                                         <dd className="text-slate-800">
-                                            {/* FIX: Cast `slots` to `TimeSlot[]` as it was being inferred as `unknown`. */}
                                             {(slots as TimeSlot[]).map(s => `${formatTime(s.start)} - ${formatTime(s.end)}`).join(', ')}
                                         </dd>
                                     </div>
@@ -115,8 +114,22 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
         </SectionReview>
 
         <SectionReview title="Pre-Screen Questions" step={7} onEdit={goToStep}>
-             <ul className="list-decimal list-inside text-slate-600 space-y-1">
-                {preScreenQuestions.filter(q => q.question).map(q => <li key={q.id}>{q.question} ({q.type})</li>)}
+             <ul className="list-decimal list-inside text-slate-800 space-y-2">
+                {preScreenQuestions.filter(q => q.question).map(q => (
+                    <li key={q.id}>
+                        <span>{q.question} <span className="text-xs bg-slate-200 text-slate-600 font-semibold px-1.5 py-0.5 rounded">{q.type}</span></span>
+                        {q.isQualifying && (
+                            <div className="pl-5 text-xs mt-1">
+                                <span className="font-semibold text-blue-600">Qualifying Answer:</span> <span className="text-slate-700">{q.qualifyingAnswer || 'Not set'}</span>
+                            </div>
+                        )}
+                         {q.type === 'Multiple Choice' && q.options && q.options.length > 0 && (
+                            <div className="pl-5 text-xs mt-1">
+                                <span className="font-semibold text-slate-500">Options:</span> <span className="text-slate-700">{q.options.join(', ')}</span>
+                            </div>
+                        )}
+                    </li>
+                ))}
             </ul>
         </SectionReview>
       </div>

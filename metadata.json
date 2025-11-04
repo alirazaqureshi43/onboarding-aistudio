@@ -1,5 +1,5 @@
-
 {
   "name": "Interactive Onboarding Walkthrough",
-  "description": "A step-by-step interactive walkthrough to guide clients through a detailed company setup and hiring workflow form, ensuring all required information is captured accurately."
+  "description": "A step-by-step interactive walkthrough to guide clients through a detailed company setup and hiring workflow form, ensuring all required information is captured accurately.",
+  "requestFramePermissions": []
 }

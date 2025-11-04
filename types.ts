@@ -27,12 +27,16 @@ export enum QuestionType {
   YES_NO = 'Yes/No',
   NUMBER = 'Number',
   TEXT = 'Text',
+  MULTIPLE_CHOICE = 'Multiple Choice',
 }
 
 export interface PreScreenQuestion {
   id: number;
   question: string;
   type: QuestionType;
+  isQualifying?: boolean;
+  qualifyingAnswer?: string;
+  options?: string[];
 }
 
 export interface TimeSlot {
