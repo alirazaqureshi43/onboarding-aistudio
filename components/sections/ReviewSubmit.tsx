@@ -48,13 +48,21 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
                 <ReviewItem label="Business Email" value={basicDetails.businessEmail} />
                 <ReviewItem label="Website" value={basicDetails.websiteUrl} />
                 <ReviewItem label="Address" value={`${basicDetails.address1}${basicDetails.address2 ? ', ' + basicDetails.address2 : ''}, ${basicDetails.city}, ${basicDetails.state} ${basicDetails.zip}, ${basicDetails.country}`} />
+                <ReviewItem label="Office Hours" value={basicDetails.officeHours} />
+                <ReviewItem label="Time Zone" value={basicDetails.timeZone} />
+                <ReviewItem label="Calendar" value={basicDetails.calendar} />
+                <ReviewItem label="Client Mgt. Software" value={basicDetails.clientManagementSoftware} />
+                <ReviewItem label="Payroll Company" value={basicDetails.payrollCompany} />
+                <ReviewItem label="Caregiver Training" value={basicDetails.caregiverTraining} />
+                <ReviewItem label="SEO Company" value={`${basicDetails.seoCompanyName} (${basicDetails.seoContactName})`} />
+                <ReviewItem label="Website Company" value={`${basicDetails.websiteCompanyName} (${basicDetails.websiteContactName})`} />
             </dl>
         </SectionReview>
 
-        <SectionReview title="Hiring Managers" step={2} onEdit={goToStep}>
+        <SectionReview title="Users" step={2} onEdit={goToStep}>
             {hiringManagers.map((hm, i) => (
                 <div key={i} className="py-2 border-b border-slate-200 last:border-b-0">
-                    <p className="font-semibold">{hm.name}</p>
+                    <p className="font-semibold">{i === 0 ? 'Primary Admin User' : 'Additional User'}: {hm.name}</p>
                     <p className="text-slate-600">{hm.email} | {hm.phone}</p>
                 </div>
             ))}

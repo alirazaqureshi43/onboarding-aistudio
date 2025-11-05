@@ -1,3 +1,4 @@
+
 export interface FileWithPreview extends File {
   preview: string;
 }
@@ -11,9 +12,10 @@ export interface HiringManager {
 }
 
 export enum StageType {
-  INTERVIEW = 'Interview',
-  FORM = 'Form',
-  CREDENTIALS = 'Credential Request',
+  APPOINTMENT_SCHEDULING = 'Appointment Scheduling',
+  FORM_APPLICATION = 'Form/Application',
+  ONBOARDING_FORMS = 'On-boarding Forms',
+  ID_CERTIFICATION = 'ID & certification requests',
   OTHER = 'Other',
 }
 
@@ -75,8 +77,12 @@ export interface FormData {
     websiteUrl: string;
     calendar: 'Google' | 'Outlook' | '';
     clientManagementSoftware: string;
-    seoCompany: string;
-    websiteCompany: string;
+    seoCompanyName: string;
+    seoContactName: string;
+    websiteCompanyName: string;
+    websiteContactName: string;
+    payrollCompany?: string;
+    caregiverTraining?: string;
   };
   hiringManagers: HiringManager[];
   companyLogo?: FileWithPreview;

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FormData, StageType, InterviewTimingConfig } from '../../types';
 import Button from '../ui/Button';
@@ -13,7 +14,7 @@ const FREQUENCY_OPTIONS = [15, 30, 45, 60];
 
 
 const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormData }) => {
-  const interviewStages = formData.workflow.filter(stage => stage.type === StageType.INTERVIEW);
+  const interviewStages = formData.workflow.filter(stage => stage.type === StageType.APPOINTMENT_SCHEDULING);
 
   const getStageConfig = (stageId: number): InterviewTimingConfig => {
     return formData.interviewTimings[stageId] || {
@@ -103,8 +104,8 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
 
       {interviewStages.length === 0 ? (
         <div className="text-center py-10 px-6 bg-slate-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-slate-700">No Interview Stages Found</h3>
-            <p className="text-slate-500 mt-2">You haven't added any "Interview" stages to your workflow yet. You can skip this step or go back to add one.</p>
+            <h3 className="text-lg font-semibold text-slate-700">No Appointment Scheduling Stages Found</h3>
+            <p className="text-slate-500 mt-2">You haven't added any "Appointment Scheduling" stages to your workflow yet. You can skip this step or go back to add one.</p>
         </div>
       ) : (
         <div className="space-y-8">

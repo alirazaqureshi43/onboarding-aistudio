@@ -8,10 +8,11 @@ interface WorkflowSetupProps {
 }
 
 const typeOptions = [
-    { type: StageType.INTERVIEW, icon: '🎤', placeholder: 'e.g., Phone Screen' },
-    { type: StageType.FORM, icon: '📝', placeholder: 'e.g., Skills Assessment Form' },
-    { type: StageType.CREDENTIALS, icon: '📄', placeholder: 'e.g., Background Check Request' },
-    { type: StageType.OTHER, icon: '✨', placeholder: 'e.g., Custom Stage Name' },
+    { type: StageType.APPOINTMENT_SCHEDULING, icon: '🗓️', placeholder: 'e.g., Video Interview, In-person Interview, Orientation' },
+    { type: StageType.FORM_APPLICATION, icon: '📝', placeholder: 'e.g., Skills Assessment Form' },
+    { type: StageType.ONBOARDING_FORMS, icon: '📑', placeholder: 'e.g., W-4, I-9, Direct Deposit' },
+    { type: StageType.ID_CERTIFICATION, icon: '📄', placeholder: 'e.g., Driver\'s License, CNA License' },
+    { type: StageType.OTHER, icon: '✨', placeholder: 'e.g., Background Check, Reference Check, Offer Letter' },
 ];
 
 const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) => {
@@ -87,7 +88,7 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
       
       <div className="pt-6 border-t border-slate-200">
         <h3 className="text-lg font-semibold text-slate-700">What is the next step in your hiring process?</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
             {typeOptions.map(option => (
                 <button
                     key={option.type}

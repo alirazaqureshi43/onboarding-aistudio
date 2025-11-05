@@ -15,7 +15,7 @@ import InterviewTimings from './components/sections/InterviewTimings';
 const STEPS = [
   "Welcome",
   "Basic Details",
-  "Hiring Manager",
+  "User Details",
   "Company Logo",
   "Workflow Setup",
   "Interview Timings",
@@ -31,14 +31,15 @@ const App: React.FC = () => {
     basicDetails: {
       companyName: '', phone: '', address1: '', address2: '', country: 'USA', city: '', state: '', zip: '',
       officeHours: '', timeZone: '', businessEmail: '', websiteUrl: '', calendar: '',
-      clientManagementSoftware: '', seoCompany: '', websiteCompany: '',
+      clientManagementSoftware: '', seoCompanyName: '', seoContactName: '', websiteCompanyName: '', websiteContactName: '',
+      payrollCompany: '', caregiverTraining: '',
     },
     hiringManagers: [{ id: 1, name: '', email: '', phone: '' }],
     workflow: [],
     interviewTimings: {},
     credentials: [
-      'Driver License', 'SSN', 'TB Result', 'Work Authorization', 
-      'CHHA', 'CNA', 'HHA', 'Auto Insurance'
+      'Driver License', 'Social Security Card', 'TB Result', 'Work Authorization', 
+      'CHHA', 'CNA', 'HHA', 'Auto Insurance', 'CPR'
     ],
     preScreenQuestions: [
         { id: 1, question: 'Do you have experience as a caregiver?', type: QuestionType.YES_NO, isQualifying: false },
@@ -57,20 +58,31 @@ const App: React.FC = () => {
         const details = formData.basicDetails;
         newErrors.basicDetails = {};
         if (!details.companyName) { newErrors.basicDetails.companyName = 'Company Name is required.'; isValid = false; }
-        if (!details.phone) { newErrors.basicDetails.phone = 'Phone Number is required.'; isValid = false; }
+        const phoneDigits = details.phone.replace(/\D/g, '');
+        if (phoneDigits.length !== 10) { newErrors.basicDetails.phone = 'A valid 10-digit phone number is required.'; isValid = false; }
+        if (!details.address1) { newErrors.basicDetails.address1 = 'Address 1 is required.'; isValid = false; }
+        if (!details.country) { newErrors.basicDetails.country = 'Country is required.'; isValid = false; }
+        if (!details.city) { newErrors.basicDetails.city = 'City is required.'; isValid = false; }
+        if (!details.state) { newErrors.basicDetails.state = 'State is required.'; isValid = false; }
+        if (!details.zip || !/^\d{5}$/.test(details.zip)) { newErrors.basicDetails.zip = 'A valid 5-digit Zip Code is required.'; isValid = false; }
         if (!details.officeHours) { newErrors.basicDetails.officeHours = 'Office Hours are required.'; isValid = false; }
         if (!details.timeZone) { newErrors.basicDetails.timeZone = 'Time Zone is required.'; isValid = false; }
         if (!details.businessEmail || !/\S+@\S+\.\S+/.test(details.businessEmail)) { newErrors.basicDetails.businessEmail = 'A valid email is required.'; isValid = false; }
         if (!details.websiteUrl) { newErrors.basicDetails.websiteUrl = 'Website URL is required.'; isValid = false; }
+        if (!details.seoCompanyName) { newErrors.basicDetails.seoCompanyName = 'SEO Company Name is required.'; isValid = false; }
+        if (!details.seoContactName) { newErrors.basicDetails.seoContactName = 'SEO Contact Name is required.'; isValid = false; }
+        if (!details.websiteCompanyName) { newErrors.basicDetails.websiteCompanyName = 'Website Company Name is required.'; isValid = false; }
+        if (!details.websiteContactName) { newErrors.basicDetails.websiteContactName = 'Website Contact Name is required.'; isValid = false; }
     }
     
-    if (step === 2) { // Hiring Managers
+    if (step === 2) { // Users
         newErrors.hiringManagers = {};
         formData.hiringManagers.forEach((hm, index) => {
             const hmErrors: {[key:string]: string} = {};
             if (!hm.name) { hmErrors.name = 'Name is required.'; isValid = false; }
             if (!hm.email || !/\S+@\S+\.\S+/.test(hm.email)) { hmErrors.email = 'A valid email is required.'; isValid = false; }
-            if (!hm.phone) { hmErrors.phone = 'Phone number is required.'; isValid = false; }
+            const phoneDigits = hm.phone.replace(/\D/g, '');
+            if (phoneDigits.length !== 10) { hmErrors.phone = 'A valid 10-digit phone number is required.'; isValid = false; }
             if (Object.keys(hmErrors).length > 0) newErrors.hiringManagers[index] = hmErrors;
         });
     }
