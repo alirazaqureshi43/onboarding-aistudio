@@ -11,9 +11,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg text-center animate-fade-in">
         <div className="max-w-md mx-auto">
-            <img src={logo} alt="Welcome" className="rounded-lg mb-6" />
+        <img src={logo} alt="Welcome" className="rounded-lg mb-6" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-800">Welcome to your onboarding form.</h1>
+        <h1 className="text-4xl font-bold text-slate-800">Welcome to your onboarding form.</h1>
         <p className="mt-4 text-lg text-slate-600">
             This interactive walkthrough will help you complete each section easily and accurately.
         </p>

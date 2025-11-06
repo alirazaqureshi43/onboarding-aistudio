@@ -54,14 +54,14 @@ const HiringManagers: React.FC<HiringManagersProps> = ({ formData, setFormData, 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">User Details</h2>
-        <p className="text-slate-500 mt-1">Provide contact information for people who will receive hiring/approval notifications.</p>
+        <h2 className="text-4xl font-bold text-slate-800">User Details</h2>
+        <p className="text-slate-600 mt-2 text-lg">Who will be the primary contact for recruitment activities?</p>
       </div>
 
       <div className="space-y-8">
         {formData.hiringManagers.map((manager, index) => (
           <div key={manager.id} className="p-6 border border-slate-200 rounded-lg relative">
-            <h3 className="text-lg font-semibold text-slate-600 mb-4">{index === 0 ? 'Primary Admin User' : `Additional User ${index + 1}`}</h3>
+            <h3 className="text-lg font-semibold text-slate-600 mb-4">{index === 0 ? 'Primary Admin User' : `Additional User`}</h3>
             {formData.hiringManagers.length > 1 && (
               <button
                 type="button"
@@ -74,9 +74,9 @@ const HiringManagers: React.FC<HiringManagersProps> = ({ formData, setFormData, 
               </button>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input label="Name *" name={`name-${manager.id}`} value={manager.name} onChange={e => handleManagerChange(index, 'name', e.target.value)} error={errors?.[index]?.name} />
-              <Input label="Email *" name={`email-${manager.id}`} type="email" value={manager.email} onChange={e => handleManagerChange(index, 'email', e.target.value)} error={errors?.[index]?.email} />
-              <PhoneInput label="Phone Number *" name={`phone-${manager.id}`} value={manager.phone} onChange={value => handleManagerChange(index, 'phone', value)} error={errors?.[index]?.phone} />
+              <Input label="Full Name *" name={`name-${manager.id}`} value={manager.name} onChange={e => handleManagerChange(index, 'name', e.target.value)} error={errors?.[index]?.name} />
+              <Input label="Email Address *" name={`email-${manager.id}`} type="email" value={manager.email} onChange={e => handleManagerChange(index, 'email', e.target.value)} error={errors?.[index]?.email} />
+              <PhoneInput label="Phone Number" name={`phone-${manager.id}`} value={manager.phone} onChange={value => handleManagerChange(index, 'phone', value)} error={errors?.[index]?.phone} />
               <div className="flex items-start gap-2">
                 <FileUploader label={`Photo/ID Card - ${manager.id}`} file={manager.file} onFileSelect={file => handleFileChange(index, file)} maxSizeMB={10} />
                  <div className="pt-8"><Tooltip text="Optional: Upload a photo or company ID card." /></div>

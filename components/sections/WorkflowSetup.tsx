@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FormData, StageType, WorkflowStage } from '../../types';
 import Button from '../ui/Button';
@@ -42,9 +43,9 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Hiring Workflow Setup</h2>
-        <p className="text-slate-500 mt-1">
-          Build your company's step-by-step hiring process after an applicant's initial screening is complete.
+        <h2 className="text-4xl font-bold text-slate-800">Hiring Workflow Setup</h2>
+        <p className="text-slate-600 mt-2 text-lg">
+          Build your company's hiring process after an applicant's initial screening.
         </p>
       </div>
 
@@ -63,9 +64,9 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
             {formData.workflow.map((stage, index) => (
                 <div key={stage.id} className="relative mb-4 flex items-center group">
                      <div className="z-10 bg-slate-50 pr-2">
-                        <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs">{index + 1}</div>
+                        <div className="w-6 h-6 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-xs">{index + 1}</div>
                     </div>
-                    <div className="flex-grow bg-slate-100 p-3 rounded-md border border-slate-200">
+                    <div className="flex-grow bg-white p-3 rounded-md border border-slate-200">
                         <p className="font-semibold">{stage.name}</p>
                         <p className="text-xs text-slate-500">{stage.type}</p>
                     </div>
@@ -93,7 +94,7 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
                 <button
                     key={option.type}
                     onClick={() => setNewStageType(option.type)}
-                    className={`p-4 border-2 rounded-lg text-center transition ${newStageType === option.type ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
+                    className={`p-4 border-2 rounded-lg text-center transition ${newStageType === option.type ? 'border-brand-primary bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                 >
                     <span className="text-2xl" role="img" aria-label={option.type}>{option.icon}</span>
                     <p className="font-semibold mt-2 text-sm text-slate-700">{option.type}</p>
@@ -111,7 +112,7 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
                     value={newStageName}
                     onChange={(e) => setNewStageName(e.target.value)}
                     placeholder={currentPlaceholder}
-                    className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm"
                     autoFocus
                  />
               </div>

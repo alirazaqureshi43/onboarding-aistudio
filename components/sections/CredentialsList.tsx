@@ -26,8 +26,8 @@ const CredentialsList: React.FC<CredentialsListProps> = ({ formData, setFormData
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Required Credentials List</h2>
-        <p className="text-slate-500 mt-1">List the documents that candidates must submit, like a driver's license or background check certificate. These are items the caregiver will provide to prove their eligibility.</p>
+        <h2 className="text-4xl font-bold text-slate-800">Required Credentials List</h2>
+        <p className="text-slate-600 mt-2 text-lg">List the documents that caregivers must provide to prove their eligibility.</p>
       </div>
 
       <div className="space-y-4">
@@ -38,7 +38,7 @@ const CredentialsList: React.FC<CredentialsListProps> = ({ formData, setFormData
               value={credential}
               onChange={(e) => handleChange(index, e.target.value)}
               placeholder={`e.g., Driver's License`}
-              className="flex-grow block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="flex-grow block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm"
             />
             <button onClick={() => removeCredential(index)} className="p-2 text-slate-400 hover:text-red-500 rounded-md">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

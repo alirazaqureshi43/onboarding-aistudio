@@ -97,8 +97,8 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ formData, setFormData, erro
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Company's Basic Details</h2>
-        <p className="text-slate-500 mt-1">This information will be used to set up your company profile.</p>
+        <h2 className="text-4xl font-bold text-slate-800">Company's Basic Details</h2>
+        <p className="text-slate-600 mt-2 text-lg">This information will be used to set up your company profile.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input

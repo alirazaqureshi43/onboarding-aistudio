@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FormData, TimeSlot, InterviewTimingConfig } from '../../types';
 import Button from '../ui/Button';
@@ -16,7 +17,7 @@ const SectionReview: React.FC<{title: string, step: number, onEdit: (step:number
     <div className="bg-slate-50 p-4 sm:p-6 rounded-lg">
         <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-            <button onClick={() => onEdit(step)} className="text-sm font-semibold text-blue-600 hover:text-blue-800">Edit</button>
+            <button onClick={() => onEdit(step)} className="text-sm font-semibold text-brand-primary hover:text-brand-primary-hover">Edit</button>
         </div>
         <div className="text-sm">{children}</div>
     </div>
@@ -37,8 +38,8 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Review Your Answers</h2>
-        <p className="text-slate-500 mt-1">Please review the information below before submitting. You can go back and edit any section.</p>
+        <h2 className="text-4xl font-bold text-slate-800">Review Your Answers</h2>
+        <p className="text-slate-600 mt-2 text-lg">Please review the information below before submitting. You can go back and edit any section.</p>
       </div>
       <div className="space-y-6">
         <SectionReview title="Basic Details" step={1} onEdit={goToStep}>
@@ -128,7 +129,7 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
                         <span>{q.question} <span className="text-xs bg-slate-200 text-slate-600 font-semibold px-1.5 py-0.5 rounded">{q.type}</span></span>
                         {q.isQualifying && (
                             <div className="pl-5 text-xs mt-1">
-                                <span className="font-semibold text-blue-600">Qualifying Answer:</span> <span className="text-slate-700">{q.qualifyingAnswer || 'Not set'}</span>
+                                <span className="font-semibold text-brand-primary">Qualifying Answer:</span> <span className="text-slate-700">{q.qualifyingAnswer || 'Not set'}</span>
                             </div>
                         )}
                          {q.type === 'Multiple Choice' && q.options && q.options.length > 0 && (

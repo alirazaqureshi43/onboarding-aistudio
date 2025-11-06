@@ -57,7 +57,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options, value,
               setSearchTerm('');
           }}
           placeholder={placeholder || "Select an option"}
-          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+          className={`block w-full px-3 py-2 border rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm ${
             error ? 'border-red-500' : 'border-slate-300'
           }`}
         />

@@ -10,14 +10,17 @@ interface LogoUploadProps {
 
 const LogoUpload: React.FC<LogoUploadProps> = ({ formData, setFormData }) => {
   const handleFileSelect = (file: FileWithPreview | null) => {
+    if (formData.companyLogo) {
+      URL.revokeObjectURL(formData.companyLogo.preview);
+    }
     setFormData(prev => ({ ...prev, companyLogo: file || undefined }));
   };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">High-Resolution Company Logo</h2>
-        <p className="text-slate-500 mt-1">Upload your company logo. This will be used on job postings and communications.</p>
+        <h2 className="text-4xl font-bold text-slate-800">High-Resolution Company Logo</h2>
+        <p className="text-slate-600 mt-2 text-lg">This will be used on job postings and communications.</p>
         <p className="text-sm text-slate-500 mt-2">Recommended: PNG with a transparent background, at least 300dpi.</p>
       </div>
       

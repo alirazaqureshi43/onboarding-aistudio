@@ -98,8 +98,8 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Interview Availability</h2>
-        <p className="text-slate-500 mt-1">Set the available days and times for each interview stage you created.</p>
+        <h2 className="text-4xl font-bold text-slate-800">Appointment Availability</h2>
+        <p className="text-slate-600 mt-2 text-lg">Set the available days and times for each appointment stage you created.</p>
       </div>
 
       {interviewStages.length === 0 ? (
@@ -131,8 +131,8 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
                       <div>
                           <label className="block text-sm font-medium text-slate-700">Appointments per Slot</label>
                           <div className="mt-2 flex gap-4">
-                            <label className="flex items-center"><input type="radio" name={`appointmentType-${stage.id}`} value="Single" checked={config.appointmentType === 'Single'} onChange={e => handleConfigChange(stage.id, 'appointmentType', e.target.value)} className="h-4 w-4 text-blue-600 border-slate-300"/> <span className="ml-2 text-sm">Single</span></label>
-                            <label className="flex items-center"><input type="radio" name={`appointmentType-${stage.id}`} value="Multiple" checked={config.appointmentType === 'Multiple'} onChange={e => handleConfigChange(stage.id, 'appointmentType', e.target.value)} className="h-4 w-4 text-blue-600 border-slate-300"/> <span className="ml-2 text-sm">Multiple</span></label>
+                            <label className="flex items-center"><input type="radio" name={`appointmentType-${stage.id}`} value="Single" checked={config.appointmentType === 'Single'} onChange={e => handleConfigChange(stage.id, 'appointmentType', e.target.value)} className="h-4 w-4 text-brand-primary border-slate-300"/> <span className="ml-2 text-sm">Single</span></label>
+                            <label className="flex items-center"><input type="radio" name={`appointmentType-${stage.id}`} value="Multiple" checked={config.appointmentType === 'Multiple'} onChange={e => handleConfigChange(stage.id, 'appointmentType', e.target.value)} className="h-4 w-4 text-brand-primary border-slate-300"/> <span className="ml-2 text-sm">Multiple</span></label>
                           </div>
                       </div>
                   </div>
@@ -150,7 +150,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
                                           id={`${stage.id}-${day}`}
                                           checked={isDayActive}
                                           onChange={() => handleDayToggle(stage.id, day)}
-                                          className="h-4 w-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                                          className="h-4 w-4 text-brand-primary border-slate-300 rounded focus:ring-brand-primary"
                                       />
                                       <label htmlFor={`${stage.id}-${day}`} className="ml-3 block text-sm font-medium text-slate-700">{day}</label>
                                   </div>
