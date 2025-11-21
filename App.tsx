@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { FormData, FormErrors, QuestionType, WorkflowStage } from './types';
+import React, { useState, useEffect } from 'react';
+import { FormData, FormErrors, HiringManager, QuestionType, WorkflowStage } from './types';
 import ProgressBar from './components/ProgressBar';
 import WelcomeScreen from './components/sections/WelcomeScreen';
 import BasicDetails from './components/sections/BasicDetails';
@@ -11,6 +11,8 @@ import CredentialsList from './components/sections/CredentialsList';
 import PreScreenQuestions from './components/sections/PreScreenQuestions';
 import ReviewSubmit from './components/sections/ReviewSubmit';
 import InterviewTimings from './components/sections/InterviewTimings';
+import { useSearchParams } from "react-router-dom";
+import ThankYou from './components/ThankYou';
 
 const STEPS = [
   "Welcome",
@@ -24,10 +26,64 @@ const STEPS = [
   "Review & Submit",
 ];
 
+// Helper function to serialize formData for localStorage (handles File objects)
+const serializeFormData = (data: FormData): string => {
+  const serializable = { ...data };
+  // Convert FileWithPreview to serializable format
+  if (serializable.companyLogo) {
+    const logo = serializable.companyLogo;
+    serializable.companyLogo = {
+      name: logo.name,
+      size: logo.size,
+      type: logo.type,
+      preview: logo.preview, // This is now a base64 string
+    } as any;
+  }
+  serializable.hiringManagers.forEach((hm: HiringManager) => {
+    if (hm.file) {
+      hm.file = {
+        name: hm.file.name,
+        size: hm.file.size,
+        type: hm.file.type,
+        preview: hm.file.preview,
+      } as any;
+    }
+  });
+  return JSON.stringify(serializable);
+};
+
+// Helper function to deserialize formData from localStorage
+const deserializeFormData = (json: string): FormData => {
+  const parsed = JSON.parse(json);
+  // Reconstruct FileWithPreview from serialized data
+  if (parsed.companyLogo && parsed.companyLogo.preview) {
+    // Create a minimal File-like object with the preview
+    // Note: We can't fully reconstruct the File object, but we can preserve the preview
+    parsed.companyLogo = {
+      name: parsed.companyLogo.name,
+      size: parsed.companyLogo.size,
+      type: parsed.companyLogo.type,
+      preview: parsed.companyLogo.preview,
+    } as any;
+  }
+  parsed.hiringManagers.forEach((hm: HiringManager) => {
+    if (hm.file && hm.file.preview) {
+      hm.file = {
+        name: hm.file.name,
+        size: hm.file.size,
+        type: hm.file.type,
+        preview: hm.file.preview,
+      } as any;
+    }
+  });
+  return parsed;
+};
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:9000/api';
 
 const App: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
+  const [currentStep, setCurrentStep] = useState(localStorage.getItem('currentStep') ? parseInt(localStorage.getItem('currentStep')!) : 0);
+  const [formData, setFormData] = useState<FormData>(localStorage.getItem('formData') ? deserializeFormData(localStorage.getItem('formData')!) : {
     basicDetails: {
       companyName: '', phone: '', address1: '', address2: '', country: 'USA', city: '', state: '', zip: '',
       officeHours: '', timeZone: '', businessEmail: '', websiteUrl: '', calendar: '',
@@ -44,11 +100,21 @@ const App: React.FC = () => {
     preScreenQuestions: [
         { id: 1, question: 'Do you have experience as a caregiver?', type: QuestionType.YES_NO, isQualifying: false },
         { id: 2, question: 'How many years of experience?', type: QuestionType.NUMBER, isQualifying: false },
-        { id: 3, question: 'Do you have a valid Driver’s License?', type: QuestionType.YES_NO, isQualifying: false },
+        { id: 3, question: 'Do you have a valid Driver\'s License?', type: QuestionType.YES_NO, isQualifying: false },
     ],
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [is404, setIs404] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [id, setId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+
 
   const validateStep = (step: number): boolean => {
     const newErrors: FormErrors = {};
@@ -93,28 +159,191 @@ const App: React.FC = () => {
 
 
   const nextStep = () => {
+    console.log(formData);
+    localStorage.setItem('formData', serializeFormData(formData));
+    localStorage.setItem('currentStep', currentStep.toString());
     if (validateStep(currentStep)) {
         setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
     }
+    handleSubmit();
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
   const goToStep = (step: number) => setCurrentStep(step);
 
-  const handleSubmit = () => {
-    // Final validation across all fields could go here
-    setIsSubmitted(true);
+  // Helper function to prepare form data for API submission
+  const prepareFormDataForAPI = (data: FormData) => {
+    const apiData: any = { ...data };
+    
+    // Convert FileWithPreview to API format
+    if (apiData.companyLogo) {
+      apiData.companyLogo = {
+        name: apiData.companyLogo.name,
+        size: apiData.companyLogo.size,
+        type: apiData.companyLogo.type,
+        preview: apiData.companyLogo.preview,
+      };
+    }
+    
+    // Convert hiring manager files
+    if (apiData.hiringManagers) {
+      apiData.hiringManagers = apiData.hiringManagers.map((hm: HiringManager) => {
+        if (hm.file) {
+          return {
+            ...hm,
+            file: {
+              name: hm.file.name,
+              size: hm.file.size,
+              type: hm.file.type,
+              preview: hm.file.preview,
+            },
+          };
+        }
+        return hm;
+      });
+    }
+    
+    return apiData;
+  };
+
+  // Generate a unique ID for the onboarding entry
+  // const generateOnboardingId = (): string => {
+  //   // Use company name + timestamp for uniqueness
+  //   const companyName = formData.basicDetails.companyName
+  //     .toLowerCase()
+  //     .replace(/[^a-z0-9]/g, '-')
+  //     .substring(0, 20);
+  //   const timestamp = Date.now();
+  //   return `${companyName}-${timestamp}`;
+  // };
+
+  const handleSubmit = async () => {
+    // setIsSubmitting(true);
+    // setSubmitError(null);
+
+    try {
+      // Prepare data for API
+      const apiData = prepareFormDataForAPI(formData);
+      
+      const url = isEditing 
+        ? `${API_URL}/onboarding/${id}`
+        : `${API_URL}/onboarding`;
+
+      // Submit to API
+      const response = await fetch(url, {
+        method: isEditing ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id,
+          step: currentStep,
+          finished: currentStep === STEPS.length - 1,
+          ...apiData,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to submit form' }));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Form submitted successfully:', result);
+
+      // Clear localStorage and show success
+      localStorage.removeItem('formData');
+      localStorage.removeItem('currentStep');
+      // setIsSubmitted(true);
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+      setSubmitError(error.message || 'Failed to submit form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
+
+  const getOnboardingById = async () => {
+    try {
+      const response = await fetch(`${API_URL}/onboarding/${id}`);
+      const res = await response.json();
+      if(res.success){
+        setIsEditing(true);
+        if(res.data.finished){
+          setIsCompleted(true);
+        }
+        else {
+          setFormData(res.data.data);
+          setCurrentStep(res.data.step);
+          setIsSubmitted(res.data.finished);
+        }
+      }else{
+        return;
+      }
+    } catch (error: any) {
+      console.error('Error fetching onboarding:', error.message);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if(id){
+      setId(id);
+    }else{
+      setIs404(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if(id){
+      getOnboardingById();
+    }else{
+      setIsLoading(false);
+     
+    }
+  }, [id])
 
   const renderStep = () => {
     if(isSubmitted) {
         return (
+         <ThankYou/>
+        )
+    }
+    if(isLoading){
+      return (
+        <div className="text-center p-12 bg-white rounded-lg shadow-xl min-h-screen flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mx-auto"></div>
+          <h2 className="text-2xl font-bold text-slate-800 mt-4">Loading...</h2>
+          <p className="text-slate-600 mt-2">Please wait while we load your information.</p>
+        </div>
+      )
+    }
+
+    if(is404){
+      return (
+        <div className="text-center p-12 bg-white absolute top-0 left-0 right-0 bottom-0 rounded-lg  min-w-screen
+         min-h-screen flex flex-col items-center justify-center">
+          <h2 className="text-2xl font-bold text-slate-800 mt-4">404 Not Found</h2>
+          <p className="text-slate-600 mt-2">The page you are looking for does not exist.</p>
+        </div>
+      )
+    }
+
+    if(isCompleted){
+      return (
+        <ThankYou/>
+      )
+    }
+
+    if (isSubmitting) {
+        return (
             <div className="text-center p-12 bg-white rounded-lg shadow-xl">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h2 className="text-3xl font-bold text-slate-800 mt-4">Form Submitted Successfully!</h2>
-                <p className="text-slate-600 mt-2">Thank you for completing the onboarding process. We will be in touch shortly.</p>
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mx-auto"></div>
+                <h2 className="text-2xl font-bold text-slate-800 mt-4">Submitting Form...</h2>
+                <p className="text-slate-600 mt-2">Please wait while we save your information.</p>
             </div>
         )
     }
@@ -128,7 +357,7 @@ const App: React.FC = () => {
       case 5: return <InterviewTimings formData={formData} setFormData={setFormData} />;
       case 6: return <CredentialsList formData={formData} setFormData={setFormData} />;
       case 7: return <PreScreenQuestions formData={formData} setFormData={setFormData} />;
-      case 8: return <ReviewSubmit formData={formData} goToStep={goToStep} handleSubmit={handleSubmit} />;
+      case 8: return <ReviewSubmit formData={formData} goToStep={goToStep} handleSubmit={handleSubmit} isSubmitting={isSubmitting} submitError={submitError} />;
       default: return <WelcomeScreen onNext={nextStep} />;
     }
   };
@@ -136,6 +365,7 @@ const App: React.FC = () => {
   const showNavigation = currentStep > 0 && currentStep < STEPS.length - 1 && !isSubmitted;
 
   return (
+
     <div className="bg-brand-background min-h-screen font-sans text-slate-800 flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 gap-12">
       <aside className="w-full md:w-72 flex-shrink-0">
         <ProgressBar steps={STEPS} currentStep={currentStep} />

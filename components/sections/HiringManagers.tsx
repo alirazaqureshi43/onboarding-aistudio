@@ -24,8 +24,23 @@ const HiringManagers: React.FC<HiringManagersProps> = ({ formData, setFormData, 
   const handleFileChange = (index: number, file: FileWithPreview | null) => {
     const updatedManagers = formData.hiringManagers.map((manager, i) => {
         if (i === index) {
-            if (manager.file) URL.revokeObjectURL(manager.file.preview);
-            return { ...manager, file: file || undefined };
+            if (manager.file) {
+                URL.revokeObjectURL(manager.file.preview);
+                manager.file = {
+                    name: manager.file.name,
+                    size: manager.file.size,
+                    type: manager.file.type,
+                    preview: manager.file.preview,
+                } as any;
+            } else {
+                manager.file = {
+                    name: file?.name,
+                    size: file?.size,
+                    type: file?.type,
+                    preview: file?.preview,
+                } as any;
+            }
+            return manager;
         }
         return manager;
     });

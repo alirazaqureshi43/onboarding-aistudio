@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { FileWithPreview } from '../../types';
 
 interface FileUploaderProps {
@@ -26,10 +26,20 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, accept = "ima
       return;
     }
     setError(null);
-    const fileWithPreview = Object.assign(selectedFile, {
-      preview: URL.createObjectURL(selectedFile),
-    });
-    onFileSelect(fileWithPreview);
+    
+    // Convert file to base64 data URL for localStorage compatibility
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const fileWithPreview = Object.assign(selectedFile, {
+        preview: reader.result as string,
+      });
+      onFileSelect(fileWithPreview);
+    };
+    reader.onerror = () => {
+      setError('Failed to read file. Please try again.');
+      onFileSelect(null);
+    };
+    reader.readAsDataURL(selectedFile);
   };
 
   const handleReset = () => {
@@ -43,12 +53,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, accept = "ima
       <label className="block text-sm font-medium text-slate-700 mb-1">{label}</label>
       {file ? (
         <div className="mt-2 flex items-center gap-4 p-2 border border-slate-300 rounded-md bg-slate-50">
-          {file.type.startsWith('image/') && (
-            <img src={file.preview} alt="Preview" className="h-16 w-16 object-cover rounded-md" />
+          {file?.type?.startsWith('image/') && (
+            <img src={file?.preview} alt="Preview" className="h-16 w-16 object-cover rounded-md" />
           )}
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800 truncate">{file.name}</p>
-            <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            <p className="text-sm font-medium text-slate-800 truncate">{file?.name}</p>
+            <p className="text-xs text-slate-500">{(file?.size / 1024 / 1024).toFixed(2)} MB</p>
           </div>
           <button type="button" onClick={handleReset} className="text-red-600 hover:text-red-800 p-1 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

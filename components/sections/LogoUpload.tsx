@@ -10,9 +10,6 @@ interface LogoUploadProps {
 
 const LogoUpload: React.FC<LogoUploadProps> = ({ formData, setFormData }) => {
   const handleFileSelect = (file: FileWithPreview | null) => {
-    if (formData.companyLogo) {
-      URL.revokeObjectURL(formData.companyLogo.preview);
-    }
     setFormData(prev => ({ ...prev, companyLogo: file || undefined }));
   };
 
