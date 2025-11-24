@@ -206,6 +206,9 @@ const App: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    if(currentStep === 0){
+       return
+    }
 
     try {
       // Prepare data for API
@@ -225,8 +228,10 @@ const App: React.FC = () => {
           data: apiData,
         }),
       });
-
+     if(currentStep === STEPS.length - 1){
       setIsSubmitted(true);
+      return;
+     }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Failed to submit form' }));
@@ -249,6 +254,10 @@ const App: React.FC = () => {
   }
 
   const getOnboardingById = async () => {
+    if(!id){
+      setIs404(true);
+      return;
+    }
     try {
       const response = await fetch(`${API_URL}/onboarding/${id}`,
         {
@@ -286,6 +295,7 @@ const App: React.FC = () => {
     if(id){
       setId(id);
     }else{
+      setIsLoading(false);
       setIs404(true);
     }
   }, [searchParams]);
