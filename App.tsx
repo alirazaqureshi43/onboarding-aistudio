@@ -367,11 +367,11 @@ const App: React.FC = () => {
   return (
 
     <div className="bg-brand-background min-h-screen font-sans text-slate-800 flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 gap-12">
-      <aside className="w-full md:w-72 flex-shrink-0">
+      <aside className="w-full md:w-72 flex-shrink-0 sm:mx-[40px]">
         <ProgressBar steps={STEPS} currentStep={currentStep} />
       </aside>
       <main className="flex-1">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-6xl">
           {renderStep()}
           {showNavigation && (
             <div className="mt-8 flex justify-between">
