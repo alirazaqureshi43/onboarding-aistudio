@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FormData, TimeSlot, InterviewTimingConfig } from '../../types';
+import { FormData, TimeSlot,  InterviewTimingConfig } from '../../types';
 import Button from '../ui/Button';
 
 interface ReviewSubmitProps {
@@ -92,17 +92,17 @@ const ReviewSubmit: React.FC<ReviewSubmitProps> = ({ formData, goToStep, handleS
             {Object.keys(interviewTimings).length > 0 ? (
                 Object.entries(interviewTimings).map(([stageId, config]) => {
                     const stage = workflow.find(s => s.id === parseInt(stageId));
-                    if (!stage || Object.keys(config.availability).length === 0) return null;
+                    if (!stage || Object.keys((config as InterviewTimingConfig).availability).length === 0) return null;
                     return (
                         <div key={stageId} className="pb-3 border-b border-slate-200 last:border-b-0">
                             <h4 className="font-semibold text-slate-700">{stage.name}</h4>
                             <div className="grid grid-cols-3 gap-2 text-xs mt-2 mb-2">
-                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Duration:</span> {config.slotDuration} min</div>
-                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Frequency:</span> {config.slotFrequency} min</div>
-                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Appt. Type:</span> {config.appointmentType}</div>
+                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Duration:</span> {(config as InterviewTimingConfig).slotDuration} min</div>
+                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Frequency:</span> {(config as InterviewTimingConfig).slotFrequency} min</div>
+                                <div className="bg-white p-1 rounded border border-slate-200"><span className="font-medium text-slate-500">Appt. Type:</span> {(config as InterviewTimingConfig).appointmentType}</div>
                             </div>
                             <dl className="mt-1 space-y-1 pl-2">
-                                {Object.entries(config.availability).map(([day, slots]) => (
+                                {Object.entries((config as InterviewTimingConfig).availability).map(([day, slots]) => (
                                     <div key={day} className="flex">
                                         <dt className="w-24 font-medium text-slate-500">{day}</dt>
                                         <dd className="text-slate-800">

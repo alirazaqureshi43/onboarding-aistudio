@@ -79,7 +79,7 @@ const deserializeFormData = (json: string): FormData => {
   return parsed;
 };
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:9000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost/api';
 
 const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(localStorage.getItem('currentStep') ? parseInt(localStorage.getItem('currentStep')!) : 0);
@@ -112,7 +112,6 @@ const App: React.FC = () => {
   const [is404, setIs404] = useState(false);
   const [searchParams] = useSearchParams();
   const [id, setId] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
 
 
@@ -206,42 +205,28 @@ const App: React.FC = () => {
     return apiData;
   };
 
-  // Generate a unique ID for the onboarding entry
-  // const generateOnboardingId = (): string => {
-  //   // Use company name + timestamp for uniqueness
-  //   const companyName = formData.basicDetails.companyName
-  //     .toLowerCase()
-  //     .replace(/[^a-z0-9]/g, '-')
-  //     .substring(0, 20);
-  //   const timestamp = Date.now();
-  //   return `${companyName}-${timestamp}`;
-  // };
-
   const handleSubmit = async () => {
-    // setIsSubmitting(true);
-    // setSubmitError(null);
 
     try {
       // Prepare data for API
       const apiData = prepareFormDataForAPI(formData);
       
-      const url = isEditing 
-        ? `${API_URL}/onboarding/${id}`
-        : `${API_URL}/onboarding`;
+      const url = `${API_URL}/onboarding/${id}`
 
       // Submit to API
       const response = await fetch(url, {
-        method: isEditing ? 'PUT' : 'POST',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: id,
           step: currentStep,
           finished: currentStep === STEPS.length - 1,
-          ...apiData,
+          data: apiData,
         }),
       });
+
+      setIsSubmitted(true);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Failed to submit form' }));
@@ -265,19 +250,27 @@ const App: React.FC = () => {
 
   const getOnboardingById = async () => {
     try {
-      const response = await fetch(`${API_URL}/onboarding/${id}`);
+      const response = await fetch(`${API_URL}/onboarding/${id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },       
+        }
+      );
       const res = await response.json();
-      if(res.success){
-        setIsEditing(true);
-        if(res.data.finished){
+      console.log(res);
+      if(res?.status){
+        if(res?.result?.finished){
           setIsCompleted(true);
         }
         else {
-          setFormData(res.data.data);
-          setCurrentStep(res.data.step);
-          setIsSubmitted(res.data.finished);
+          setFormData(res?.result?.data || formData);
+          setCurrentStep(res?.result?.step || currentStep);
+          setIsSubmitted(res?.result?.finished || false);
         }
       }else{
+        setIs404(true);
         return;
       }
     } catch (error: any) {
@@ -300,9 +293,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if(id){
       getOnboardingById();
-    }else{
-      setIsLoading(false);
-     
     }
   }, [id])
 
