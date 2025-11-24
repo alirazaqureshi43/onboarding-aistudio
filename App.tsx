@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { FormData, FormErrors, HiringManager, QuestionType, WorkflowStage } from './types';
+import { FormData, FormErrors, HiringManager, QuestionType } from './types';
 import ProgressBar from './components/ProgressBar';
 import WelcomeScreen from './components/sections/WelcomeScreen';
 import BasicDetails from './components/sections/BasicDetails';
@@ -13,6 +13,7 @@ import ReviewSubmit from './components/sections/ReviewSubmit';
 import InterviewTimings from './components/sections/InterviewTimings';
 import { useSearchParams } from "react-router-dom";
 import ThankYou from './components/ThankYou';
+import AuthGuard from './components/AuthGuard';
 
 const STEPS = [
   "Welcome",
@@ -39,7 +40,7 @@ const serializeFormData = (data: FormData): string => {
       preview: logo.preview, // This is now a base64 string
     } as any;
   }
-  serializable.hiringManagers.forEach((hm: HiringManager) => {
+  serializable?.hiringManagers?.forEach((hm: HiringManager) => {
     if (hm.file) {
       hm.file = {
         name: hm.file.name,
@@ -66,7 +67,7 @@ const deserializeFormData = (json: string): FormData => {
       preview: parsed.companyLogo.preview,
     } as any;
   }
-  parsed.hiringManagers.forEach((hm: HiringManager) => {
+  parsed?.hiringManagers?.forEach((hm: HiringManager) => {
     if (hm.file && hm.file.preview) {
       hm.file = {
         name: hm.file.name,
@@ -79,7 +80,7 @@ const deserializeFormData = (json: string): FormData => {
   return parsed;
 };
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:9000/api';
+const API_URL = process.env.REACT_APP_API_ENDPOINT || 'http://localhost/api';
 
 const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(localStorage.getItem('currentStep') ? parseInt(localStorage.getItem('currentStep')!) : 0);
@@ -104,16 +105,14 @@ const App: React.FC = () => {
     ],
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [is404, setIs404] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [id, setId] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [searchParams] = useSearchParams();
 
 
   const validateStep = (step: number): boolean => {
@@ -165,81 +164,81 @@ const App: React.FC = () => {
     if (validateStep(currentStep)) {
         setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
     }
-    handleSubmit();
+    if(currentStep === 0){
+      return;
+    }
+    else {
+      handleSubmit();
+    }
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
   const goToStep = (step: number) => setCurrentStep(step);
 
-  // Helper function to prepare form data for API submission
-  const prepareFormDataForAPI = (data: FormData) => {
-    const apiData: any = { ...data };
-    
-    // Convert FileWithPreview to API format
-    if (apiData.companyLogo) {
-      apiData.companyLogo = {
-        name: apiData.companyLogo.name,
-        size: apiData.companyLogo.size,
-        type: apiData.companyLogo.type,
-        preview: apiData.companyLogo.preview,
-      };
-    }
-    
-    // Convert hiring manager files
-    if (apiData.hiringManagers) {
-      apiData.hiringManagers = apiData.hiringManagers.map((hm: HiringManager) => {
-        if (hm.file) {
-          return {
-            ...hm,
-            file: {
-              name: hm.file.name,
-              size: hm.file.size,
-              type: hm.file.type,
-              preview: hm.file.preview,
-            },
-          };
-        }
-        return hm;
-      });
-    }
-    
-    return apiData;
-  };
+ // Convert camelCase to snake_case
+const toSnakeCase = (str: string) =>
+  str.replace(/([A-Z])/g, "_$1").toLowerCase();
 
-  // Generate a unique ID for the onboarding entry
-  // const generateOnboardingId = (): string => {
-  //   // Use company name + timestamp for uniqueness
-  //   const companyName = formData.basicDetails.companyName
-  //     .toLowerCase()
-  //     .replace(/[^a-z0-9]/g, '-')
-  //     .substring(0, 20);
-  //   const timestamp = Date.now();
-  //   return `${companyName}-${timestamp}`;
-  // };
+// Recursively convert object or array keys to snake_case
+const convertKeysToSnake = (value: any): any => {
+  if (Array.isArray(value)) {
+    return value.map((item) => convertKeysToSnake(item));
+  } else if (value && typeof value === "object" && !(value instanceof File)) {
+    return Object.keys(value).reduce((acc: any, key: string) => {
+      const newKey = toSnakeCase(key);
+      acc[newKey] = convertKeysToSnake(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
+};
+
+// Helper function to prepare form data for API submission
+const prepareFormDataForAPI = (data: FormData) => {
+  const apiData: any = { ...data };
+
+  // Fix file references and strip File objects to JSON-safe structures
+  if (apiData.companyLogo) {
+    const { name, size, type, preview } = apiData.companyLogo;
+    apiData.companyLogo = { name, size, type, preview };
+  }
+
+  if (apiData.hiringManagers) {
+    apiData.hiringManagers = apiData.hiringManagers.map((hm: any) => {
+      if (hm.file) {
+        const { name, size, type, preview } = hm.file;
+        return { ...hm, file: { name, size, type, preview } };
+      }
+      return hm;
+    });
+  }
+
+  // Convert all keys to snake_case recursively
+  return convertKeysToSnake(apiData);
+};
+
+
 
   const handleSubmit = async () => {
-    // setIsSubmitting(true);
-    // setSubmitError(null);
 
     try {
       // Prepare data for API
       const apiData = prepareFormDataForAPI(formData);
+      const onboardingId = searchParams.get("id");
       
-      const url = isEditing 
-        ? `${API_URL}/onboarding/${id}`
-        : `${API_URL}/onboarding`;
+      const url = `${API_URL}/onboarding/session/${onboardingId}/step`;
 
       // Submit to API
       const response = await fetch(url, {
-        method: isEditing ? 'PUT' : 'POST',
+        method:'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: id,
+          // id: id,
           step: currentStep,
           finished: currentStep === STEPS.length - 1,
-          ...apiData,
+          data: apiData,
         }),
       });
 
@@ -265,20 +264,24 @@ const App: React.FC = () => {
 
   const getOnboardingById = async () => {
     try {
-      const response = await fetch(`${API_URL}/onboarding/${id}`);
+      const onboardingId = searchParams.get("id");  
+      const response = await fetch(`${API_URL}/onboarding/session/${onboardingId}`);
       const res = await response.json();
-      if(res.success){
-        setIsEditing(true);
-        if(res.data.finished){
-          setIsCompleted(true);
-        }
-        else {
-          setFormData(res.data.data);
-          setCurrentStep(res.data.step);
-          setIsSubmitted(res.data.finished);
-        }
-      }else{
-        return;
+      if(res.status){
+        const safeData = {
+          ...res.data,
+          ...(res.data.companyLogo && { companyLogo: res.data.companyLogo }),
+          ...(res.data.hiringManagers && { hiringManagers: res.data.hiringManagers }),
+          ...(res.data.workflow && { workflow: res.data.workflow }),
+          ...(res.data.interviewTimings && { interviewTimings: res.data.interviewTimings }),
+          ...(res.data.credentials && { credentials: res.data.credentials }),
+          ...(res.data.preScreenQuestions && { preScreenQuestions: res.data.preScreenQuestions }),
+          ...(res.data.basicDetails && { basicDetails: res.data.basicDetails }),
+        };
+      
+        setFormData(safeData);
+        setCurrentStep(res.currentStep);
+        setIsSubmitted(res.finished);
       }
     } catch (error: any) {
       console.error('Error fetching onboarding:', error.message);
@@ -288,23 +291,16 @@ const App: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    const id = searchParams.get("id");
-    if(id){
-      setId(id);
-    }else{
-      setIs404(true);
-    }
-  }, [searchParams]);
+  
 
   useEffect(() => {
-    if(id){
+    const onboardingId = searchParams.get("id");
+    if(onboardingId){
+      console.log(onboardingId);
+      setId(onboardingId);
       getOnboardingById();
-    }else{
-      setIsLoading(false);
-     
     }
-  }, [id])
+  }, [searchParams])
 
   const renderStep = () => {
     if(isSubmitted) {
@@ -318,16 +314,6 @@ const App: React.FC = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mx-auto"></div>
           <h2 className="text-2xl font-bold text-slate-800 mt-4">Loading...</h2>
           <p className="text-slate-600 mt-2">Please wait while we load your information.</p>
-        </div>
-      )
-    }
-
-    if(is404){
-      return (
-        <div className="text-center p-12 bg-white absolute top-0 left-0 right-0 bottom-0 rounded-lg  min-w-screen
-         min-h-screen flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-bold text-slate-800 mt-4">404 Not Found</h2>
-          <p className="text-slate-600 mt-2">The page you are looking for does not exist.</p>
         </div>
       )
     }
@@ -365,7 +351,7 @@ const App: React.FC = () => {
   const showNavigation = currentStep > 0 && currentStep < STEPS.length - 1 && !isSubmitted;
 
   return (
-
+    <AuthGuard setIsLoading={setIsLoading} >
     <div className="bg-brand-background min-h-screen font-sans text-slate-800 flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 gap-12">
       <aside className="w-full md:w-72 flex-shrink-0">
         <ProgressBar steps={STEPS} currentStep={currentStep} />
@@ -392,6 +378,7 @@ const App: React.FC = () => {
         </div>
       </main>
     </div>
+    </AuthGuard>
   );
 };
 

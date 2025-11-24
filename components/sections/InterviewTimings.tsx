@@ -14,10 +14,10 @@ const FREQUENCY_OPTIONS = [15, 30, 45, 60];
 
 
 const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormData }) => {
-  const interviewStages = formData.workflow.filter(stage => stage.type === StageType.APPOINTMENT_SCHEDULING);
+  const interviewStages = formData?.workflow?.filter(stage => stage.type === StageType.APPOINTMENT_SCHEDULING) || [];
 
   const getStageConfig = (stageId: number): InterviewTimingConfig => {
-    return formData.interviewTimings[stageId] || {
+    return formData?.interviewTimings?.[stageId] || {
       slotDuration: 30,
       slotFrequency: 15,
       appointmentType: 'Single',
@@ -27,7 +27,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
 
   const handleConfigChange = (stageId: number, field: keyof Omit<InterviewTimingConfig, 'availability'>, value: string | number) => {
     setFormData(prev => {
-      const newTimings = { ...prev.interviewTimings };
+      const newTimings = { ...prev?.interviewTimings || {} };
       const currentConfig = getStageConfig(stageId);
       
       newTimings[stageId] = {
@@ -41,7 +41,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
 
   const handleDayToggle = (stageId: number, day: string) => {
     setFormData(prev => {
-      const newTimings = JSON.parse(JSON.stringify(prev.interviewTimings));
+      const newTimings = JSON.parse(JSON.stringify(prev?.interviewTimings || {}));
       
       if (!newTimings[stageId]) {
         newTimings[stageId] = getStageConfig(stageId);
@@ -61,7 +61,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
 
   const addSlot = (stageId: number, day: string) => {
     setFormData(prev => {
-        const newTimings = JSON.parse(JSON.stringify(prev.interviewTimings));
+        const newTimings = JSON.parse(JSON.stringify(prev?.interviewTimings || {}));
         const daySlots = newTimings[stageId].availability[day] || [];
         daySlots.push({ id: Date.now(), start: '', end: '' });
         newTimings[stageId].availability[day] = daySlots;
@@ -71,7 +71,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
 
   const updateSlot = (stageId: number, day: string, slotId: number, part: 'start' | 'end', value: string) => {
      setFormData(prev => {
-        const newTimings = JSON.parse(JSON.stringify(prev.interviewTimings));
+        const newTimings = JSON.parse(JSON.stringify(prev?.interviewTimings || {}));
         const daySlots = newTimings[stageId].availability[day].map((slot: any) => 
             slot.id === slotId ? { ...slot, [part]: value } : slot
         );
@@ -82,7 +82,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
   
   const removeSlot = (stageId: number, day: string, slotId: number) => {
     setFormData(prev => {
-        const newTimings = JSON.parse(JSON.stringify(prev.interviewTimings));
+        const newTimings = JSON.parse(JSON.stringify(prev?.interviewTimings || {}));
         let daySlots = newTimings[stageId].availability[day].filter((slot: any) => slot.id !== slotId);
 
         if (daySlots.length === 0) {
@@ -109,7 +109,7 @@ const InterviewTimings: React.FC<InterviewTimingsProps> = ({ formData, setFormDa
         </div>
       ) : (
         <div className="space-y-8">
-          {interviewStages.map(stage => {
+          {interviewStages?.map(stage => {
               const config = getStageConfig(stage.id);
               return (
               <div key={stage.id} className="p-6 border border-slate-200 rounded-lg">

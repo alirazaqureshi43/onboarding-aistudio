@@ -51,7 +51,7 @@ const HiringManagers: React.FC<HiringManagersProps> = ({ formData, setFormData, 
     setFormData(prev => ({
       ...prev,
       hiringManagers: [
-        ...prev.hiringManagers,
+        ...prev?.hiringManagers || [],
         { id: Date.now(), name: '', email: '', phone: '' }
       ]
     }));
@@ -74,7 +74,7 @@ const HiringManagers: React.FC<HiringManagersProps> = ({ formData, setFormData, 
       </div>
 
       <div className="space-y-8">
-        {formData.hiringManagers.map((manager, index) => (
+        {formData?.hiringManagers?.map((manager, index) => (
           <div key={manager.id} className="p-6 border border-slate-200 rounded-lg relative">
             <h3 className="text-lg font-semibold text-slate-600 mb-4">{index === 0 ? 'Primary Admin User' : `Additional User`}</h3>
             {formData.hiringManagers.length > 1 && (

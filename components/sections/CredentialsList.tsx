@@ -10,17 +10,17 @@ interface CredentialsListProps {
 
 const CredentialsList: React.FC<CredentialsListProps> = ({ formData, setFormData }) => {
   const handleChange = (index: number, value: string) => {
-    const updatedCredentials = [...formData.credentials];
+    const updatedCredentials = [...formData?.credentials || []];
     updatedCredentials[index] = value;
     setFormData(prev => ({ ...prev, credentials: updatedCredentials }));
   };
 
   const addCredential = () => {
-    setFormData(prev => ({ ...prev, credentials: [...prev.credentials, ''] }));
+    setFormData(prev => ({ ...prev, credentials: [...prev?.credentials || [], ''] }));
   };
 
   const removeCredential = (index: number) => {
-    setFormData(prev => ({ ...prev, credentials: prev.credentials.filter((_, i) => i !== index) }));
+    setFormData(prev => ({ ...prev, credentials: prev?.credentials?.filter((_, i) => i !== index) || [] }));
   };
 
   return (
@@ -31,7 +31,7 @@ const CredentialsList: React.FC<CredentialsListProps> = ({ formData, setFormData
       </div>
 
       <div className="space-y-4">
-        {formData.credentials.map((credential, index) => (
+        {formData?.credentials?.map((credential, index) => (
           <div key={index} className="flex items-center gap-2">
             <input
               type="text"

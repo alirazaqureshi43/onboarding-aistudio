@@ -29,7 +29,7 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
       name: newStageName.trim(),
     };
 
-    setFormData(prev => ({ ...prev, workflow: [...prev.workflow, newStage] }));
+    setFormData(prev => ({ ...prev, workflow: [...prev?.workflow || [], newStage] }));
     setNewStageName('');
     setNewStageType(null);
   };
@@ -61,7 +61,7 @@ const WorkflowSetup: React.FC<WorkflowSetupProps> = ({ formData, setFormData }) 
                 <span className="font-semibold text-slate-600 bg-slate-50 pl-2">Initial Screening</span>
             </div>
             
-            {formData.workflow.map((stage, index) => (
+            {formData?.workflow?.map((stage, index) => (
                 <div key={stage.id} className="relative mb-4 flex items-center group">
                      <div className="z-10 bg-slate-50 pr-2">
                         <div className="w-6 h-6 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-xs">{index + 1}</div>
